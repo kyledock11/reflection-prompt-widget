@@ -87,6 +87,31 @@
       background: #2a2725;
       margin: 1.5rem 0 0;
     }
+
+    .journal-btn {
+      display: inline-block;
+      margin-top: 1.25rem;
+      background: rgba(126, 184, 208, 0.12);
+      border: 1px solid rgba(126, 184, 208, 0.2);
+      border-radius: 6px;
+      padding: 0.5rem 0.75rem;
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #7eb8d0;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .journal-btn:hover:not(:disabled) {
+      background: rgba(126, 184, 208, 0.2);
+    }
+
+    .journal-btn:disabled {
+      cursor: default;
+    }
   </style>
 </head>
 <body>
@@ -94,10 +119,13 @@
     <div class="header-label">Daily Reflection</div>
     <div class="prompt-text" id="prompt"></div>
     <div class="category-label" id="category"></div>
+    <button class="journal-btn" id="journal-btn">Journal This</button>
     <div class="divider"></div>
   </div>
 
   <script>
+    const CORS_PROXY = 'https://cors-proxy.kyle-d7d.workers.dev';
+
     const prompts = [
       // Self-Awareness
       { text: "What assumption did I challenge today?", category: "Self-Awareness" },
@@ -197,6 +225,53 @@
 
     document.getElementById('prompt').textContent = today.text;
     document.getElementById('category').textContent = today.category;
+
+    const journalBtn = document.getElementById('journal-btn');
+
+    journalBtn.addEventListener('click', async () => {
+      journalBtn.textContent = 'Creating...';
+      journalBtn.disabled = true;
+      journalBtn.style.color = '#7eb8d0';
+
+      const titleText = 'Reflection: ' + today.text.slice(0, 80);
+      const bodyContent = today.text + '\n\nCategory: ' + today.category + '\n\n---\n\nReflection:\n';
+
+      const payload = {
+        database: '3226a121-2986-816e-a777-da5ab00e6126',
+        title: titleText,
+        content: bodyContent,
+        properties: {
+          Category: { type: 'multi_select', values: ['Philosophy'] },
+          Tags: { type: 'multi_select', values: ['Reflection', today.category] }
+        }
+      };
+
+      try {
+        const res = await fetch(CORS_PROXY + '/?mode=notion', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) throw new Error('Request failed with status ' + res.status);
+
+        journalBtn.textContent = 'Created ✓';
+        journalBtn.style.color = '#6ec07a';
+        setTimeout(() => {
+          journalBtn.textContent = 'Journal This';
+          journalBtn.style.color = '#7eb8d0';
+          journalBtn.disabled = false;
+        }, 2000);
+      } catch (err) {
+        journalBtn.textContent = 'Failed';
+        journalBtn.style.color = '#c06e6e';
+        setTimeout(() => {
+          journalBtn.textContent = 'Journal This';
+          journalBtn.style.color = '#7eb8d0';
+          journalBtn.disabled = false;
+        }, 2000);
+      }
+    });
   </script>
 </body>
 </html>

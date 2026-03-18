@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily Reflection</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Inter:wght@400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: #191919;
+      color: #f2efea;
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      scrollbar-width: thin;
+      scrollbar-color: #2a2725 #191919;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #191919;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2a2725;
+      border-radius: 3px;
+    }
+
+    .widget {
+      background: #191919;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      width: 100%;
+      text-align: left;
+      opacity: 0;
+      animation: fadeIn 0.6s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .header-label {
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      font-size: 0.7rem;
+      color: #a09a92;
+      text-transform: uppercase;
+      letter-spacing: 0.25em;
+      margin-bottom: 1rem;
+    }
+
+    .prompt-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 600;
+      font-size: 1.3rem;
+      color: #f2efea;
+      line-height: 1.7;
+      margin-bottom: 0.75rem;
+    }
+
+    .category-label {
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      font-size: 0.65rem;
+      color: #6b6660;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .divider {
+      width: 32px;
+      height: 1px;
+      background: #2a2725;
+      margin: 1.5rem 0 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="widget">
+    <div class="header-label">Daily Reflection</div>
+    <div class="prompt-text" id="prompt"></div>
+    <div class="category-label" id="category"></div>
+    <div class="divider"></div>
+  </div>
+
+  <script>
+    const prompts = [
+      // Self-Awareness
+      { text: "What assumption did I challenge today?", category: "Self-Awareness" },
+      { text: "What emotion am I least comfortable sitting with, and why?", category: "Self-Awareness" },
+      { text: "What did I learn about myself this week?", category: "Self-Awareness" },
+      { text: "In what ways am I still the same person I was five years ago — and is that good?", category: "Self-Awareness" },
+      { text: "What patterns do I keep repeating that I haven't fully examined?", category: "Self-Awareness" },
+      { text: "Where do I tend to be dishonest with myself?", category: "Self-Awareness" },
+      { text: "What would a more honest version of me say about my current path?", category: "Self-Awareness" },
+      { text: "What do my reactions today reveal about what I value?", category: "Self-Awareness" },
+      { text: "When do I feel most like myself — and when do I feel furthest away?", category: "Self-Awareness" },
+      { text: "What role am I playing right now that no longer fits?", category: "Self-Awareness" },
+
+      // Fear
+      { text: "What would I do differently if I wasn't afraid?", category: "Fear" },
+      { text: "What am I avoiding and why?", category: "Fear" },
+      { text: "What fear is quietly running decisions I think are rational?", category: "Fear" },
+      { text: "What's the worst realistic outcome of the thing I'm most afraid to try?", category: "Fear" },
+      { text: "What would I attempt if failure had no social consequence?", category: "Fear" },
+      { text: "What am I protecting myself from that I don't actually need to protect myself from?", category: "Fear" },
+      { text: "Where is comfort costing me more than discomfort would?", category: "Fear" },
+
+      // Growth
+      { text: "What belief have I outgrown?", category: "Growth" },
+      { text: "What has changed in how I think about success in the last year?", category: "Growth" },
+      { text: "What is the hardest thing I've done — and what did it make possible?", category: "Growth" },
+      { text: "Where am I growing slowly without realizing it?", category: "Growth" },
+      { text: "What would I need to unlearn to get where I want to go?", category: "Growth" },
+      { text: "What chapter of my life just ended, and am I ready to acknowledge it?", category: "Growth" },
+      { text: "What difficulty am I currently in the middle of that will later be formative?", category: "Growth" },
+      { text: "What skill or understanding do I wish I'd developed ten years earlier?", category: "Growth" },
+
+      // Gratitude
+      { text: "What am I taking for granted that I would miss immediately if it were gone?", category: "Gratitude" },
+      { text: "Who made a quiet difference in my life that I've never fully acknowledged?", category: "Gratitude" },
+      { text: "What ordinary moment today deserves more appreciation than I gave it?", category: "Gratitude" },
+      { text: "What difficult experience am I now grateful for?", category: "Gratitude" },
+      { text: "What access, ability, or opportunity do I overlook that others don't have?", category: "Gratitude" },
+      { text: "What is quietly working in my life right now?", category: "Gratitude" },
+
+      // Relationships
+      { text: "Who brings out the best in me — and do I spend enough time with them?", category: "Relationships" },
+      { text: "What conversation have I been postponing that needs to happen?", category: "Relationships" },
+      { text: "Where am I keeping score instead of showing up fully?", category: "Relationships" },
+      { text: "What do the people closest to me need from me that I haven't been giving?", category: "Relationships" },
+      { text: "Who in my life am I not truly seeing right now?", category: "Relationships" },
+      { text: "What relationship dynamic am I participating in that I'd hate to admit?", category: "Relationships" },
+      { text: "Where am I waiting for someone else to change instead of changing my approach?", category: "Relationships" },
+      { text: "Who have I outgrown in my thinking, and how do I hold that with respect?", category: "Relationships" },
+
+      // Purpose
+      { text: "What would I work on if money and reputation weren't part of the equation?", category: "Purpose" },
+      { text: "What problem in the world am I best positioned to help solve?", category: "Purpose" },
+      { text: "What would make this year feel like it mattered in ten years?", category: "Purpose" },
+      { text: "When do I feel the clearest sense that what I'm doing is right?", category: "Purpose" },
+      { text: "What legacy am I building — intentionally or by default?", category: "Purpose" },
+      { text: "What would I regret not having tried?", category: "Purpose" },
+      { text: "If I couldn't talk about what I do, how would I describe what I care about?", category: "Purpose" },
+
+      // Decision-Making
+      { text: "What decision am I overthinking that I already know the answer to?", category: "Decision-Making" },
+      { text: "Where am I optimizing for approval instead of what's actually right?", category: "Decision-Making" },
+      { text: "What information am I waiting for that I'll never have — and what should I do anyway?", category: "Decision-Making" },
+      { text: "What decision would future me most thank present me for making today?", category: "Decision-Making" },
+      { text: "Where is my reasoning sound but my conclusion still wrong?", category: "Decision-Making" },
+      { text: "What am I deciding by not deciding?", category: "Decision-Making" },
+      { text: "What would I choose if I were certain no one was watching?", category: "Decision-Making" },
+
+      // Values
+      { text: "Where did my actions today diverge from what I say I believe?", category: "Values" },
+      { text: "What do I claim to value that my calendar and attention don't reflect?", category: "Values" },
+      { text: "What value has quietly become more important to me lately?", category: "Values" },
+      { text: "Where am I compromising on something I once thought was non-negotiable?", category: "Values" },
+      { text: "What do I believe now that would surprise my past self?", category: "Values" },
+      { text: "What principle am I willing to defend even when it costs me something?", category: "Values" },
+
+      // Habits & Energy
+      { text: "What habit is silently shaping who I'm becoming?", category: "Habits" },
+      { text: "What am I consuming — content, conversations, environments — that is diminishing me?", category: "Habits" },
+      { text: "When do I feel most energized, and how little time do I actually spend there?", category: "Habits" },
+      { text: "What small thing, done consistently, would compound into something significant?", category: "Habits" },
+      { text: "What am I doing out of routine that I'd never consciously choose?", category: "Habits" },
+      { text: "Where am I spending attention that doesn't align with what I care about?", category: "Habits" },
+      { text: "What would I do with an extra hour if distraction wasn't an option?", category: "Habits" },
+    ];
+
+    function getDayOfYear() {
+      const now = new Date();
+      const start = new Date(now.getFullYear(), 0, 0);
+      const diff = now - start;
+      const oneDay = 1000 * 60 * 60 * 24;
+      return Math.floor(diff / oneDay);
+    }
+
+    const index = getDayOfYear() % prompts.length;
+    const today = prompts[index];
+
+    document.getElementById('prompt').textContent = today.text;
+    document.getElementById('category').textContent = today.category;
+  </script>
+</body>
+</html>

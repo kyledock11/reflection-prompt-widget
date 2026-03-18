@@ -241,7 +241,8 @@
         title: titleText,
         content: bodyContent,
         properties: {
-          Category: { type: 'multi_select', values: ['Philosophy'] },
+          Area: { type: 'multi_select', values: ['Philosophy'] },
+          Type: { type: 'select', value: 'Reflection' },
           Tags: { type: 'multi_select', values: ['Reflection', today.category] }
         }
       };

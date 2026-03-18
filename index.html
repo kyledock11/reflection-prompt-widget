@@ -233,6 +233,9 @@
       journalBtn.disabled = true;
       journalBtn.style.color = '#7eb8d0';
 
+      // Open tab immediately to avoid popup blocker
+      const newTab = window.open('about:blank', '_blank');
+
       const titleText = 'Reflection: ' + today.text.slice(0, 80);
       const bodyContent = today.text + '\n\nCategory: ' + today.category + '\n\n---\n\nReflection:\n';
 
@@ -260,9 +263,9 @@
         journalBtn.textContent = 'Created ✓';
         journalBtn.style.color = '#6ec07a';
 
-        // Open the created page in a new tab
-        if (data.url) {
-          window.open(data.url, '_blank');
+        // Redirect the pre-opened tab to the Notion page
+        if (data.url && newTab) {
+          newTab.location.href = data.url;
         }
 
         setTimeout(() => {
@@ -271,6 +274,7 @@
           journalBtn.disabled = false;
         }, 2000);
       } catch (err) {
+        if (newTab) newTab.close();
         journalBtn.textContent = 'Failed';
         journalBtn.style.color = '#c06e6e';
         setTimeout(() => {

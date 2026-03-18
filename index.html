@@ -254,10 +254,17 @@
           body: JSON.stringify(payload)
         });
 
-        if (!res.ok) throw new Error('Request failed with status ' + res.status);
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.error || 'Request failed');
 
         journalBtn.textContent = 'Created ✓';
         journalBtn.style.color = '#6ec07a';
+
+        // Open the created page in a new tab
+        if (data.url) {
+          window.open(data.url, '_blank');
+        }
+
         setTimeout(() => {
           journalBtn.textContent = 'Journal This';
           journalBtn.style.color = '#7eb8d0';

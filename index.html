@@ -233,9 +233,6 @@
       journalBtn.disabled = true;
       journalBtn.style.color = '#7eb8d0';
 
-      // Open tab immediately to avoid popup blocker
-      const newTab = window.open('about:blank', '_blank');
-
       const titleText = 'Reflection: ' + today.text.slice(0, 80);
       const bodyContent = today.text + '\n\nCategory: ' + today.category + '\n\n---\n\nReflection:\n';
 
@@ -260,21 +257,14 @@
         const data = await res.json();
         if (!res.ok || !data.success) throw new Error(data.error || 'Request failed');
 
-        journalBtn.textContent = 'Created ✓';
-        journalBtn.style.color = '#6ec07a';
-
-        // Redirect the pre-opened tab to the Notion page
-        if (data.url && newTab) {
-          newTab.location.href = data.url;
-        }
+        journalBtn.innerHTML = `<a href="${data.url}" target="_blank" rel="noopener" style="color:#6ec07a;text-decoration:none;">Open in Notion →</a>`;
 
         setTimeout(() => {
           journalBtn.textContent = 'Journal This';
           journalBtn.style.color = '#7eb8d0';
           journalBtn.disabled = false;
-        }, 2000);
+        }, 8000);
       } catch (err) {
-        if (newTab) newTab.close();
         journalBtn.textContent = 'Failed';
         journalBtn.style.color = '#c06e6e';
         setTimeout(() => {
